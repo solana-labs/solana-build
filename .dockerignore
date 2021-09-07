@@ -1,0 +1,5 @@
+.dockerignore
+.gitignore
+target
+Dockerfile
+README.md
