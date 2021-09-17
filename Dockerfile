@@ -15,5 +15,8 @@ COPY src src
 
 RUN cargo build-bpf
 
-RUN export PACKAGE=`cargo metadata --no-deps --format-version=1 | jq -r '.packages[0].name' | sed 's/-/_/g'` \
- && openssl dgst -sha256 -hex target/deploy/${PACKAGE}.so > target/deploy/${PACKAGE}-sha256.txt
+RUN set -e \
+ && export PACKAGE=`cargo metadata --no-deps --format-version=1 | jq -r '.packages[0].name' | sed 's/-/_/g'` \
+ && export FILE=`target/deploy/${PACKAGE}.so` \
+ && export HASH=`openssl dgst -sha256 $FILE | cut -d' ' -f2` \
+ && echo $HASH > target/deploy/${PACKAGE}-sha256.txt
