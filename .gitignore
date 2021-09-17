@@ -1,3 +1,6 @@
 /*-dump.txt
 /*.so
 /target/
+
+*.tar
+*.tar.gz
