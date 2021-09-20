@@ -8,7 +8,7 @@ set -x
 export REMOTE_REPO=docker.io/jordansexton/
 
 # Get the name of the package from Cargo.toml and transform it to a filename
-export PACKAGE_NAME=`cargo metadata --no-deps --format-version=1 | jq -r '.packages[0].name' | sed 's/-/_/g'` \
+export PACKAGE_NAME=$(cargo metadata --no-deps --format-version=1 | jq -r '.packages[0].name' | sed 's/-/_/g') \
 
 # Tag the image as latest
 export LOCAL_IMAGE=${PACKAGE_NAME}:latest
@@ -17,7 +17,7 @@ export LOCAL_IMAGE=${PACKAGE_NAME}:latest
 docker build -t $LOCAL_IMAGE .
 
 # Get the sha256 hash of the image from the ID
-export IMAGE_HASH=`docker images --no-trunc --quiet $LOCAL_IMAGE | cut -d':' -f2`
+export IMAGE_HASH=$(docker images --no-trunc --quiet $LOCAL_IMAGE | cut -d':' -f2)
 
 # The final name of the image that will be stored on chain in the ELF file
 export REMOTE_IMAGE=${REMOTE_REPO}${PACKAGE_NAME}:${IMAGE_HASH}
@@ -29,7 +29,7 @@ docker image tag $PACKAGE_NAME $REMOTE_IMAGE
 docker push $REMOTE_IMAGE
 
 # Create a container from the image
-export CONTAINER=`docker create $LOCAL_IMAGE`
+export CONTAINER=$(docker create $LOCAL_IMAGE)
 
 # Set the build output directory
 export DIRECTORY=target/deploy
@@ -41,7 +41,7 @@ rm -rf ${DIRECTORY}/*
 docker cp ${CONTAINER}:/build/${DIRECTORY}/. ${DIRECTORY}/
 
 # Read the hash of the ELF file
-export ELF_HASH=`cat ${DIRECTORY}/${PACKAGE_NAME}-sha256.txt`
+export ELF_HASH=$(cat ${DIRECTORY}/${PACKAGE_NAME}-sha256.txt)
 
 # Append the hashes to the ELF file (this should be replaced with something smarter)
 echo -e "\n${ELF_HASH}\n${REMOTE_IMAGE}" >> ${DIRECTORY}/${PACKAGE_NAME}.so
