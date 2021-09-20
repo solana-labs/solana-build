@@ -14,10 +14,10 @@ export PACKAGE_NAME=`cargo metadata --no-deps --format-version=1 | jq -r '.packa
 export LOCAL_IMAGE=${PACKAGE_NAME}:latest
 
 # Build the image
-docker build -t $IMAGE .
+docker build -t $LOCAL_IMAGE .
 
 # Get the sha256 hash of the image from the ID
-export IMAGE_HASH=`docker images --no-trunc --quiet $IMAGE | cut -d':' -f2`
+export IMAGE_HASH=`docker images --no-trunc --quiet $LOCAL_IMAGE | cut -d':' -f2`
 
 # The final name of the image that will be stored on chain in the ELF file
 export REMOTE_IMAGE=${REMOTE_REPO}${PACKAGE_NAME}:${IMAGE_HASH}
@@ -29,7 +29,7 @@ docker image tag $PACKAGE_NAME $REMOTE_IMAGE
 docker push $REMOTE_IMAGE
 
 # Create a container from the image
-export CONTAINER=`docker create $IMAGE`
+export CONTAINER=`docker create $LOCAL_IMAGE`
 
 # Set the build output directory
 export DIRECTORY=target/deploy
@@ -47,4 +47,4 @@ export ELF_HASH=`cat ${DIRECTORY}/${PACKAGE_NAME}-sha256.txt`
 echo -e "\n${ELF_HASH}\n${REMOTE_IMAGE}" >> ${DIRECTORY}/${PACKAGE_NAME}.so
 
 # Optionally, save the docker image to a file (could be stored on arweave as a backup of the Docker repo)
-# docker save $IMAGE | gzip > ${PACKAGE_NAME}.tar.gz
+# docker save $LOCAL_IMAGE | gzip > ${PACKAGE_NAME}.tar.gz
