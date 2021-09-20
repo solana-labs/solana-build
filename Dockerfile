@@ -1,8 +1,7 @@
 FROM solanalabs/rust:1.54.0
 
+RUN curl -sSfL "https://release.solana.com/v1.7.11/install" | sh
 ENV PATH="/root/.local/share/solana/install/active_release/bin:${PATH}"
-
-RUN sh -c "$(curl -sSfL https://release.solana.com/v1.7.11/install)"
 
 RUN set -x \
  && apt update \
